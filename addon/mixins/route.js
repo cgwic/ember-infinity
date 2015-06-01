@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import InfinityRouteBase from 'ember-infinity/mixins/infinity-route-base';
 
 /**
   The Ember Infinity Route Mixin enables an application route to load paginated
@@ -10,7 +11,7 @@ import Ember from 'ember';
   @module ember-infinity/mixins/route
   @extends Ember.Mixin
 */
-export default Ember.Mixin.create({
+export default Ember.Mixin.create(InfinityRouteBase, {
 
   /**
     @private
@@ -30,14 +31,6 @@ export default Ember.Mixin.create({
 
   /**
     @private
-    @property _extraParams
-    @type Object
-    @default {}
-  */
-  _extraParams: {},
-
-  /**
-    @private
     @property _loadingMore
     @type Boolean
     @default false
@@ -51,14 +44,6 @@ export default Ember.Mixin.create({
     @default 0
   */
   _totalPages: 0,
-
-  /**
-    @private
-    @property _infinityModelName
-    @type String
-    @default null
-  */
-  _infinityModelName: null,
 
   /**
     @private
@@ -115,33 +100,23 @@ export default Ember.Mixin.create({
   */
   infinityModel(modelName, options) {
 
-    if (Ember.isEmpty(this.store) || Ember.isEmpty(this.store.find)){
-      throw new Ember.Error("Ember Data store is not available to infinityModel");
-    } else if (modelName === undefined) {
-      throw new Ember.Error("You must pass a Model Name to infinityModel");
-    }
+    var extraParams = options ? Ember.merge({}, options) : {};
+    var startingPage = extraParams.startingPage || 1;
+    var perPage      = extraParams.perPage || this.get('_perPage');
+    var modelPath    = extraParams.modelPath || this.get('_modelPath');
 
-    this.set('_infinityModelName', modelName);
-
-    options = options ? Ember.merge({}, options) : {};
-    var startingPage = options.startingPage || 1;
-    var perPage      = options.perPage || this.get('_perPage');
-    var modelPath    = options.modelPath || this.get('_modelPath');
-
-    delete options.startingPage;
-    delete options.perPage;
-    delete options.modelPath;
+    delete extraParams.startingPage;
+    delete extraParams.perPage;
+    delete extraParams.modelPath;
 
     this.set('_perPage', perPage);
     this.set('_modelPath', modelPath);
-    this.set('_extraParams', options);
 
     var requestPayloadBase = {};
     requestPayloadBase[this.get('perPageParam')] = perPage;
     requestPayloadBase[this.get('pageParam')] = startingPage;
 
-    var params = Ember.merge(requestPayloadBase, options);
-    var promise = this.store.find(modelName, params);
+    var promise = this._super(modelName, requestPayloadBase, extraParams);
 
     promise.then(
       infinityModel => {
@@ -174,13 +149,11 @@ export default Ember.Mixin.create({
     var perPage     = this.get('_perPage');
     var totalPages  = this.get('_totalPages');
     var model       = this.get(this.get('_modelPath'));
-    var modelName   = this.get('_infinityModelName');
 
     if (!this.get('_loadingMore') && this.get('_canLoadMore')) {
       this.set('_loadingMore', true);
 
-      var params = Ember.merge({ page: nextPage, per_page: perPage }, this.get('_extraParams'));
-      var promise = this.store.find(modelName, params);
+      var promise = this._super({ page: nextPage, per_page: perPage });
 
       promise.then(
         infinityModel => {
