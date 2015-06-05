@@ -1,6 +1,6 @@
 {
   "name": "ember-infinity",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Simple, flexible infinite scroll for Ember CLI Apps.",
   "directories": {
     "doc": "doc",
@@ -45,6 +45,7 @@
     "ember-cli-htmlbars": "0.7.6"
   },
   "ember-addon": {
-    "configPath": "tests/dummy/config"
+    "configPath": "tests/dummy/config",
+    "demoURL": "http://hhff.github.io/ember-infinity/"
   }
 }
