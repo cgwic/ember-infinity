@@ -105,9 +105,6 @@ export default Ember.Mixin.create(InfinityRouteBase, {
     var totalCount  = this.get('totalCount');
     var currentOffset = this.get('_currentOffset');
     var offsetStep = this.get('offsetStep');
-    console.log('totalCount:', totalCount);
-    console.log('currentOffset:', currentOffset);
-    console.log('offsetStep:', offsetStep);
     return (totalCount && offsetStep) ? (currentOffset < totalCount) : false;
   }),
 
@@ -126,7 +123,6 @@ export default Ember.Mixin.create(InfinityRouteBase, {
     var initialOffset = extraParams.initialOffset || this.get('_currentOffset');
     var limit         = extraParams.limit || this.get('_limit');
     var offsetStep    = extraParams.offsetStep || limit;
-    console.log('offsetStep:', offsetStep);
     var modelPath     = extraParams.modelPath || this.get('_modelPath');
 
     delete extraParams.initialOffset;
