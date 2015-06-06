@@ -249,3 +249,102 @@ test('it uses extra params when loading more data', assert => {
   assert.ok(model.get('reachedInfinity'), 'Should reach infinity');
 
 });
+
+test('setting limit without setting offsetStep should set offsetStep to the same value', assert => {
+  var RouteObject = Ember.Route.extend(OffsetRouteMixin, {
+    model() {
+      return this.infinityModel('item', {limit: 666});
+    }
+  });
+  var route = RouteObject.create();
+
+  var dummyStore = {
+    find() {
+      return new Ember.RSVP.Promise(resolve => {
+        Ember.run(this, resolve, Ember.Object.create({
+          items: [{id: 1, name: 'Test'}],
+          meta: {
+            totalCount: 31
+          }
+        }));
+      });
+    }
+  };
+
+  route.store = dummyStore;
+
+  var model;
+  Ember.run(() => {
+    route.model().then(result => {
+      model = result;
+    });
+  });
+
+  assert.equal(route.get('offsetStep'), 666, 'offsetStep got different value');
+});
+
+test('setting limit with offsetStep should set offsetStep to it own value', assert => {
+  var RouteObject = Ember.Route.extend(OffsetRouteMixin, {
+    model() {
+      return this.infinityModel('item', {limit: 666, offsetStep: 333});
+    }
+  });
+  var route = RouteObject.create();
+
+  var dummyStore = {
+    find() {
+      return new Ember.RSVP.Promise(resolve => {
+        Ember.run(this, resolve, Ember.Object.create({
+          items: [{id: 1, name: 'Test'}],
+          meta: {
+            totalCount: 31
+          }
+        }));
+      });
+    }
+  };
+
+  route.store = dummyStore;
+
+  var model;
+  Ember.run(() => {
+    route.model().then(result => {
+      model = result;
+    });
+  });
+
+  assert.equal(route.get('offsetStep'), 333, 'offsetStep got different value');
+});
+
+test('setting offsetStep without setting limit should set offsetStep only', assert => {
+  var RouteObject = Ember.Route.extend(OffsetRouteMixin, {
+    model() {
+      return this.infinityModel('item', {offsetStep: 666});
+    }
+  });
+  var route = RouteObject.create();
+
+  var dummyStore = {
+    find() {
+      return new Ember.RSVP.Promise(resolve => {
+        Ember.run(this, resolve, Ember.Object.create({
+          items: [{id: 1, name: 'Test'}],
+          meta: {
+            totalCount: 31
+          }
+        }));
+      });
+    }
+  };
+
+  route.store = dummyStore;
+
+  var model;
+  Ember.run(() => {
+    route.model().then(result => {
+      model = result;
+    });
+  });
+
+  assert.notEqual(route.get('limit'), 666, 'limit got the same value');
+});

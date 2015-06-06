@@ -125,7 +125,8 @@ export default Ember.Mixin.create(InfinityRouteBase, {
     var extraParams   = options ? Ember.merge({}, options) : {};
     var initialOffset = extraParams.initialOffset || this.get('_currentOffset');
     var limit         = extraParams.limit || this.get('_limit');
-    var offsetStep    = extraParams.offsetStep || this.get('_limit');
+    var offsetStep    = extraParams.offsetStep || limit;
+    console.log('offsetStep:', offsetStep);
     var modelPath     = extraParams.modelPath || this.get('_modelPath');
 
     delete extraParams.initialOffset;
