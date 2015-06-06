@@ -54,6 +54,16 @@ export default Ember.Mixin.create(InfinityRouteBase, {
   _modelPath: 'controller.model',
 
   /**
+   * Total count
+   * Should get this property instead of _totalCount
+   * @type Integer
+   * @default  0
+   */
+  totalCount: Ember.computed('_totalCount', function() {
+    return this.get('_totalCount');
+  }),
+
+  /**
     @private
     @property offsetStep
     @type Integer
@@ -91,8 +101,8 @@ export default Ember.Mixin.create(InfinityRouteBase, {
     @type Boolean
     @default false
   */
-  _canLoadMore: Ember.computed('_totalCount', '_currentOffset', 'offsetStep', function() {
-    var totalCount  = this.get('_totalCount');
+  _canLoadMore: Ember.computed('totalCount', '_currentOffset', 'offsetStep', function() {
+    var totalCount  = this.get('totalCount');
     var currentOffset = this.get('_currentOffset');
     var offsetStep = this.get('offsetStep');
     console.log('totalCount:', totalCount);
@@ -162,7 +172,7 @@ export default Ember.Mixin.create(InfinityRouteBase, {
   _infinityLoad() {
     var nextOffset    = this.get('_currentOffset') + this.get('offsetStep');
     var limit     = this.get('_limit');
-    var totalCount  = this.get('_totalCount');
+    var totalCount  = this.get('totalCount');
     var model       = this.get(this.get('_modelPath'));
 
     if (!this.get('_loadingMore') && this.get('_canLoadMore')) {
